@@ -1,4 +1,5 @@
 numeral-qt
 ==========
 
-Numeral format for Qt-based applications
+Library designed for numeral format in Qt-based applications.
+
