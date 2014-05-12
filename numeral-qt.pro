@@ -15,5 +15,9 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += test.cpp
+SOURCES += test.cpp \
+    numeral.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
+
+HEADERS += \
+    numeral.h
