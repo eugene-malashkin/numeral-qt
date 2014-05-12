@@ -215,3 +215,216 @@ void NumeralFormat::parseFractionalPart(const QStringRef &st)
 {
     m_precision = st.count('0');
 }
+
+
+//******************************************************************************************************
+/*!
+ *\class Numeral
+*/
+//******************************************************************************************************
+
+QLocale *Numeral::m_defaultLocale = NULL;
+QString *Numeral::m_defaultNanStub = NULL;
+
+Numeral::Numeral()
+    : m_numeralFormat()
+    , m_locale(defaultLocale())
+    , m_nanStub(defaultNanStub())
+{
+    m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
+}
+
+Numeral::Numeral(const NumeralFormat &format)
+    : m_numeralFormat(format)
+    , m_locale(defaultLocale())
+    , m_nanStub(defaultNanStub())
+{
+    m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
+}
+
+Numeral::Numeral(const NumeralFormat &format, const QLocale &locale)
+    : m_numeralFormat(format)
+    , m_locale(locale)
+    , m_nanStub(defaultNanStub())
+{
+    m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
+}
+
+void Numeral::setNumeralFormat(const NumeralFormat &value)
+{
+    m_numeralFormat = value;
+}
+
+NumeralFormat Numeral::numeralFormat() const
+{
+    return m_numeralFormat;
+}
+
+void Numeral::setlocale(const QLocale &value)
+{
+    m_locale = value;
+    m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
+}
+
+QLocale Numeral::locale() const
+{
+    return m_locale;
+}
+
+void Numeral::setNanStub(const QString &value)
+{
+    m_nanStub = value;
+}
+
+QString Numeral::nanStub() const
+{
+    return m_nanStub;
+}
+
+void Numeral::setDefaultLocale(const QLocale &value)
+{
+    createDefaultLocaleIfNeeded();
+    *m_defaultLocale = value;
+}
+
+QLocale Numeral::defaultLocale()
+{
+    createDefaultLocaleIfNeeded();
+    return *m_defaultLocale;
+}
+
+void Numeral::setDefaultNanStub(const QString &value)
+{
+    createDefaultNanStubIfNeeded();
+    *m_defaultNanStub = value;
+}
+
+QString Numeral::defaultNanStub()
+{
+    createDefaultNanStubIfNeeded();
+    return *m_defaultNanStub;
+}
+
+QString Numeral::toString(double number) const
+{
+    if (isNan(number))
+    {
+        return m_nanStub;
+    }
+    else
+    {
+        double cnumber = (m_numeralFormat.percent())? number*100.0 : number;
+        QString result = initialFormat(fabs(cnumber));
+        result = decorateTrimmingZeros(result);
+        result = decorateThousandSeparator(result);
+        result = decorateSign(result, cnumber);
+        if (m_numeralFormat.percent())
+        {
+            result = result + m_locale.percent();
+        }
+        return result;
+    }
+}
+
+QString Numeral::format(double number, const NumeralFormat &numeralFormat)
+{
+    Numeral n(numeralFormat);
+    return n.toString(number);
+}
+
+QString Numeral::decorateSign(const QString &formattedNumber, double number) const
+{
+    QString sign;
+    bool isNegative = (number < -DBL_EPSILON);
+    bool isPositive = (number > +DBL_EPSILON);
+    if (isNegative)
+    {
+        sign = m_locale.negativeSign();
+    }
+    else if ((isPositive) && (m_numeralFormat.sign()))
+    {
+        sign = m_locale.positiveSign();
+    }
+    return sign + formattedNumber;
+}
+
+QString Numeral::decorateThousandSeparator(const QString &formattedNumber) const
+{
+    if (!m_numeralFormat.thousandSeparate())
+    {
+        return formattedNumber;
+    }
+    else
+    {
+        QString result = formattedNumber;
+        int startPosition = result.indexOf(QRegExp("[0-9]"));
+        if (startPosition >= 0)
+        {
+            int endPosition = result.indexOf(m_locale.decimalPoint());
+            if (endPosition < 0)
+            {
+                endPosition = result.length();
+            }
+            for (int i = endPosition - 3; i >= startPosition + 1; i -= 3)
+            {
+                result.insert(i, m_locale.groupSeparator());
+            }
+        }
+        return result;
+    }
+}
+
+QString Numeral::decorateTrimmingZeros(const QString &formattedNumber) const
+{
+    QString result = formattedNumber;
+    if (m_numeralFormat.extraPrecision())
+    {
+        int decimalIndex = result.indexOf(m_locale.decimalPoint());
+        if (decimalIndex >= 0)
+        {
+            int stopIndex = decimalIndex + m_numeralFormat.precision();
+            int truncateAfterIndex = stopIndex;
+            for (int i = result.length()-1; i >= stopIndex; i--)
+            {
+                if (result[i] != '0')
+                {
+                    truncateAfterIndex = i;
+                    break;
+                }
+            }
+            if (truncateAfterIndex == decimalIndex)
+            {
+                // chop off decimal splitter too
+                truncateAfterIndex--;
+            }
+            result = result.left(truncateAfterIndex+1);
+        }
+    }
+    return result;
+}
+
+QString Numeral::initialFormat(double positiveNumber) const
+{
+    int precision = 6;
+    if (!m_numeralFormat.extraPrecision())
+    {
+        precision = m_numeralFormat.precision();
+    }
+    return m_locale.toString(positiveNumber + DBL_EPSILON, 'f', qMax(precision, 0));
+}
+
+void Numeral::createDefaultLocaleIfNeeded()
+{
+    if (m_defaultLocale == NULL)
+    {
+        m_defaultLocale = new QLocale;
+    }
+}
+
+void Numeral::createDefaultNanStubIfNeeded()
+{
+    if (m_defaultNanStub == NULL)
+    {
+        m_defaultNanStub = new QString;
+    }
+}
