@@ -4,14 +4,14 @@
 #include <QString>
 #include <QLocale>
 
-class NumeralFormat
+class Numeral
 {
 public:
-    NumeralFormat();
-    NumeralFormat(const QString &st);
-    NumeralFormat(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent);
-    bool operator == (const NumeralFormat &another);
-    bool operator != (const NumeralFormat &another);
+    Numeral();
+    Numeral(const QString &st);
+    Numeral(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent);
+    bool operator == (const Numeral &another);
+    bool operator != (const Numeral &another);
     void clear();
     void setFormatString(const QString &st);
     QString formatString() const;
@@ -25,6 +25,17 @@ public:
     bool extraPrecision() const;
     void setPercent(bool value);
     bool percent() const;
+    QString toString(double number, const QString &nanStub, const QLocale &locale) const;
+    QString toString(double number, const QString &nanStub) const;
+    QString toString(double number) const;
+    static QString format(double number, const QString &formatString, const QString &nanStub, const QLocale &locale);
+    static QString format(double number, const QString &formatString, const QString &nanStub);
+    static QString format(double number, const QString &formatString);
+    static QString format(double number);
+    static void setDefaultLocale(const QLocale &value);
+    static QLocale defaultLocale();
+    static void setDefaultNanStub(const QString &value);
+    static QString defaultNanStub();
 
 private:
     bool m_sign;
@@ -32,45 +43,17 @@ private:
     int m_precision;
     bool m_extraPrecision;
     bool m_percent;
+    static QLocale *m_defaultLocale;
+    static QString *m_defaultNanStub;
     void parse(const QStringRef &st);
     void parseIntegerPart(const QStringRef &st);
     void parseFractionalPart(const QStringRef &st);
-};
-
-class Numeral
-{
-public:
-    Numeral();
-    Numeral(const NumeralFormat &numeralFormat);
-    Numeral(const NumeralFormat &numeralFormat, const QLocale &locale);
-    void setNumeralFormat(const NumeralFormat &value);
-    NumeralFormat numeralFormat() const;
-    void setlocale(const QLocale &value);
-    QLocale locale() const;
-    void setNanStub(const QString &value);
-    QString nanStub() const;
-    static void setDefaultLocale(const QLocale &value);
-    static QLocale defaultLocale();
-    static void setDefaultNanStub(const QString &value);
-    static QString defaultNanStub();
-    QString toString(double number) const;
-    static QString format(double number, const NumeralFormat &numeralFormat = NumeralFormat());
-
-private:
-    NumeralFormat m_numeralFormat;
-    QLocale m_locale;
-    QString m_nanStub;
-    static QLocale *m_defaultLocale;
-    static QString *m_defaultNanStub;
-
-public:
-    QString decorateSign(const QString &formattedNumber, double number) const;
-    QString decorateThousandSeparator(const QString &formattedNumber) const;
-    QString decorateTrimmingZeros(const QString &formattedNumber) const;
-    QString initialFormat(double positiveNumber) const;
+    QString decorateSign(const QString &formattedNumber, double number, const QLocale &locale) const;
+    QString decorateThousandSeparator(const QString &formattedNumber, const QLocale &locale) const;
+    QString decorateTrimmingZeros(const QString &formattedNumber, const QLocale &locale) const;
+    QString initialFormat(double positiveNumber, const QLocale &locale) const;
     static void createDefaultLocaleIfNeeded();
     static void createDefaultNanStubIfNeeded();
 };
-
 
 #endif // NUMERAL_H
