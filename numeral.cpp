@@ -5,11 +5,66 @@
 
 //******************************************************************************************************
 /*!
+ *\class NumeralLocale
+*/
+//******************************************************************************************************
+
+NumeralLocale::NumeralLocale()
+    : m_locale()
+    , m_groupSeparator()
+{
+
+}
+
+NumeralLocale::NumeralLocale(const QLocale &locale)
+    : m_locale(locale)
+    , m_groupSeparator()
+{
+
+}
+
+NumeralLocale::NumeralLocale(const QLocale &locale, const QString &groupSeparator)
+    : m_locale(locale)
+    , m_groupSeparator(groupSeparator)
+{
+
+}
+
+NumeralLocale::NumeralLocale(const NumeralLocale &another)
+    : m_locale(another.m_locale)
+    , m_groupSeparator(another.m_groupSeparator)
+{
+
+}
+
+void NumeralLocale::setLocale(const QLocale &value)
+{
+    m_locale = value;
+}
+
+QLocale NumeralLocale::locale() const
+{
+    return m_locale;
+}
+
+void NumeralLocale::setGroupSeparator(const QString &value)
+{
+    m_groupSeparator = value;
+}
+
+QString NumeralLocale::groupSeparator() const
+{
+    return m_groupSeparator;
+}
+
+
+//******************************************************************************************************
+/*!
  *\class Numeral
 */
 //******************************************************************************************************
 
-QLocale *Numeral::m_defaultLocale = NULL;
+NumeralLocale *Numeral::m_defaultNumeralLocale = NULL;
 QString *Numeral::m_defaultNanStub = NULL;
 
 Numeral::Numeral()
@@ -148,7 +203,7 @@ bool Numeral::percent() const
     return m_percent;
 }
 
-QString Numeral::toString(double number, const QString &nanStub, const QLocale &locale) const
+QString Numeral::toString(double number, const QString &nanStub, const NumeralLocale &numeralLocale) const
 {
     if (qIsNaN(number))
     {
@@ -156,8 +211,11 @@ QString Numeral::toString(double number, const QString &nanStub, const QLocale &
     }
     else
     {
-        QLocale clocale(locale);
-        clocale.setNumberOptions(QLocale::OmitGroupSeparator);
+        NumeralLocale clocale(numeralLocale);
+        QLocale tmp = clocale.locale();
+        tmp.setNumberOptions(QLocale::OmitGroupSeparator);
+        clocale.setLocale(tmp);
+
         double cnumber = (percent())? number*100.0 : number;
         QString result = initialFormat(fabs(cnumber), clocale);
         result = decorateTrimmingZeros(result, clocale);
@@ -165,7 +223,7 @@ QString Numeral::toString(double number, const QString &nanStub, const QLocale &
         result = decorateSign(result, cnumber, clocale);
         if (percent())
         {
-            result = result + clocale.percent();
+            result = result + clocale.locale().percent();
         }
         return result;
     }
@@ -173,7 +231,7 @@ QString Numeral::toString(double number, const QString &nanStub, const QLocale &
 
 QString Numeral::toString(double number, const QString &nanStub) const
 {
-    return toString(number, nanStub, defaultLocale());
+    return toString(number, nanStub, defaultNumeralLocale());
 }
 
 QString Numeral::toString(double number) const
@@ -181,10 +239,10 @@ QString Numeral::toString(double number) const
     return toString(number, defaultNanStub());
 }
 
-QString Numeral::format(double number, const QString &formatString, const QString &nanStub, const QLocale &locale)
+QString Numeral::format(double number, const QString &formatString, const QString &nanStub, const NumeralLocale &numeralLocale)
 {
     Numeral obj(formatString);
-    return obj.toString(number, nanStub, locale);
+    return obj.toString(number, nanStub, numeralLocale);
 }
 
 QString Numeral::format(double number, const QString &formatString, const QString &nanStub)
@@ -205,16 +263,16 @@ QString Numeral::format(double number)
     return obj.toString(number);
 }
 
-void Numeral::setDefaultLocale(const QLocale &value)
+void Numeral::setDefaultNumeralLocale(const NumeralLocale &value)
 {
-    createDefaultLocaleIfNeeded();
-    *m_defaultLocale = value;
+    createDefaultNumeralLocaleIfNeeded();
+    *m_defaultNumeralLocale = value;
 }
 
-QLocale Numeral::defaultLocale()
+NumeralLocale Numeral::defaultNumeralLocale()
 {
-    createDefaultLocaleIfNeeded();
-    return *m_defaultLocale;
+    createDefaultNumeralLocaleIfNeeded();
+    return *m_defaultNumeralLocale;
 }
 
 void Numeral::setDefaultNanStub(const QString &value)
@@ -290,23 +348,23 @@ void Numeral::parseFractionalPart(const QStringRef &st)
     m_precision = st.count('0');
 }
 
-QString Numeral::decorateSign(const QString &formattedNumber, double number, const QLocale &locale) const
+QString Numeral::decorateSign(const QString &formattedNumber, double number, const NumeralLocale &numeralLocale) const
 {
     QString s;
     bool isNegative = (number < -DBL_EPSILON);
     bool isPositive = (number > +DBL_EPSILON);
     if (isNegative)
     {
-        s = locale.negativeSign();
+        s = numeralLocale.locale().negativeSign();
     }
     else if ((isPositive) && (sign()))
     {
-        s = locale.positiveSign();
+        s = numeralLocale.locale().positiveSign();
     }
     return s + formattedNumber;
 }
 
-QString Numeral::decorateThousandSeparator(const QString &formattedNumber, const QLocale &locale) const
+QString Numeral::decorateThousandSeparator(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
 {
     if (!thousandSeparate())
     {
@@ -318,26 +376,26 @@ QString Numeral::decorateThousandSeparator(const QString &formattedNumber, const
         int startPosition = result.indexOf(QRegExp("[0-9]"));
         if (startPosition >= 0)
         {
-            int endPosition = result.indexOf(locale.decimalPoint());
+            int endPosition = result.indexOf(numeralLocale.locale().decimalPoint());
             if (endPosition < 0)
             {
                 endPosition = result.length();
             }
             for (int i = endPosition - 3; i >= startPosition + 1; i -= 3)
             {
-                result.insert(i, locale.groupSeparator());
+                result.insert(i, numeralLocale.groupSeparator());
             }
         }
         return result;
     }
 }
 
-QString Numeral::decorateTrimmingZeros(const QString &formattedNumber, const QLocale &locale) const
+QString Numeral::decorateTrimmingZeros(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
 {
     QString result = formattedNumber;
     if (extraPrecision())
     {
-        int decimalIndex = result.indexOf(locale.decimalPoint());
+        int decimalIndex = result.indexOf(numeralLocale.locale().decimalPoint());
         if (decimalIndex >= 0)
         {
             int stopIndex = decimalIndex + precision();
@@ -361,21 +419,21 @@ QString Numeral::decorateTrimmingZeros(const QString &formattedNumber, const QLo
     return result;
 }
 
-QString Numeral::initialFormat(double positiveNumber, const QLocale &locale) const
+QString Numeral::initialFormat(double positiveNumber, const NumeralLocale &numeralLocale) const
 {
     int p = 6;
     if (!extraPrecision())
     {
         p = precision();
     }
-    return locale.toString(positiveNumber + DBL_EPSILON, 'f', qMax(p, 0));
+    return numeralLocale.locale().toString(positiveNumber + DBL_EPSILON, 'f', qMax(p, 0));
 }
 
-void Numeral::createDefaultLocaleIfNeeded()
+void Numeral::createDefaultNumeralLocaleIfNeeded()
 {
-    if (m_defaultLocale == NULL)
+    if (m_defaultNumeralLocale == NULL)
     {
-        m_defaultLocale = new QLocale;
+        m_defaultNumeralLocale = new NumeralLocale;
     }
 }
 

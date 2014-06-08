@@ -29,7 +29,7 @@ private:
 
 Test::Test()
 {
-    Numeral::setDefaultLocale(QLocale(QLocale::C));
+    Numeral::setDefaultNumeralLocale(QLocale(QLocale::C));
     Numeral::setDefaultNanStub("n\\a");
 }
 
