@@ -8,6 +8,8 @@ QString st = Numeral::format(12345.67); // "12,345.67"
 
 ## Format string
 
+This library is infused by http://numeraljs.com/, but has a slightly different syntax. 
+
 You can define numeral format in one string named "format string". For instance, you would like to format number without thousands separator ("0") and with two digits after dot (".00"):
 ```
 QString st = Numeral::format(12345.678, "0.00"); // result "12345.68", format string is "0.00"
@@ -54,7 +56,7 @@ n.setPrecision(4);
 QString st = n.toString(0.1234); // "+12.3400%"
 ```
 
-## Working with QLocale
+## Working with locale
 You can use appropriate locale for formatting. Because of you can't change locale parameters, there is NumeralLocale class - a composition of QLocale and changeable group separator. 
 ```
 NumeralLocale nl(QLocale::C, " ");  // " " is group separator
