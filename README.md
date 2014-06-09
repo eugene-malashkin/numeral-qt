@@ -34,20 +34,6 @@ Numeral::format(0.1234, "+0.00%"); // "+12.340%"
 Numeral::format(-0.12345, "+0.00%"); // "-12.345%"
 ```
 
-## Working with NaN
-You can format NaN as you want:
-```
-Numeral::format(qQNaN(), "0.0", "-"); // "-"
-```
-
-Or you can define default NaN stub once, and don't care about specifying it later:
-```
-Numeral::setDefaultNanStub("nOT a nUMBER");
-
-// Later
-Numeral::format(qQNaN()); // "nOT a nUMBER"
-```
-
 ## Storing numeral format
 You can use instance of Numeral class for storing numeral format.
 ```
@@ -69,4 +55,18 @@ Numeral::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
 
 // Later
 Numeral::format(1234.5678);  //"1 234.5678"
+```
+
+## Working with NaN
+You can format NaN as you want:
+```
+Numeral::format(qQNaN(), "0.0", "-"); // "-"
+```
+
+Or you can define default NaN stub once, and don't care about specifying it later:
+```
+Numeral::setDefaultNanStub("nOT a nUMBER");
+
+// Later
+Numeral::format(qQNaN()); // "nOT a nUMBER"
 ```
