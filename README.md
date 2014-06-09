@@ -32,8 +32,22 @@ Numeral::format(0.1234, "+0.00%"); // "+12.340%"
 Numeral::format(-0.12345, "+0.00%"); // "-12.345%"
 ```
 
-## Storying numeral format
-You can use instance of Numeral class for storying numeral format.
+## Working with NaN
+You can format NaN as you want:
+```
+Numeral::format(qQNaN(), "0.0", "-"); // "-"
+```
+
+Or you can define default NaN stub once, and don't care about specifying it later:
+```
+Numeral::setDefaultNanStub("nOT a nUMBER");
+
+// Later
+Numeral::format(qQNaN()); // "nOT a nUMBER"
+```
+
+## Storing numeral format
+You can use instance of Numeral class for storing numeral format.
 ```
 Numeral n("+0.00%");  // you can use default constructor, copy of Numeral or from QString
 n.setPrecision(4);
@@ -41,8 +55,16 @@ QString st = n.toString(0.1234); // "+12.3400%"
 ```
 
 ## Working with QLocale
-You can use appropriate locale for formatting:
+You can use appropriate locale for formatting. Because of you can't change locale parameters, there is NumeralLocale class - a composition of QLocale and changeable group separator. 
 ```
-QLocale locale(QLocale::C);
-locale.
+NumeralLocale nl(QLocale::C, " ");  // " " is group separator
+Numeral::format(1234.5678, "0,0.*", "-", nl); // "1 234.5678"
+```
+
+Or you can define default numeral locale once, and don't care about specifying it later:
+```
+Numeral::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
+
+// Later
+Numeral::format(1234.5678);  //"1 234.5678"
 ```

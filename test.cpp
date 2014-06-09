@@ -14,6 +14,7 @@ public:
 private slots:
     void testStorying();
     void testDoing();
+    void testNumeralLocale();
 
 private:
     void testNumeralFormat(
@@ -51,7 +52,16 @@ void Test::testDoing()
     QVERIFY(Numeral::format(12345.678, "0,0.0*") == "12,345.678");
     QVERIFY(Numeral::format(12345.678, "0,0.0000*") == "12,345.6780");
     QVERIFY(Numeral::format(12345.678, "0.0000*") == "12345.6780");
-    QVERIFY(Numeral::format(qQNaN()) == "n\\a");
+    QVERIFY(Numeral::format(qQNaN(), "0.0", "-") == "-");
+}
+
+void Test::testNumeralLocale()
+{
+    NumeralLocale nl(QLocale::C, " ");
+    QVERIFY(Numeral::format(1234.5678, "0,0.*", "-", nl) == "1 234.5678");
+
+    Numeral::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
+    QVERIFY(Numeral::format(1234.5678) == "1 234.5678");
 }
 
 void Test::testNumeralFormat(const Numeral &numeral,

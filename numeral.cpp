@@ -11,14 +11,14 @@
 
 NumeralLocale::NumeralLocale()
     : m_locale()
-    , m_groupSeparator()
+    , m_groupSeparator(m_locale.groupSeparator())
 {
 
 }
 
 NumeralLocale::NumeralLocale(const QLocale &locale)
     : m_locale(locale)
-    , m_groupSeparator()
+    , m_groupSeparator(m_locale.groupSeparator())
 {
 
 }
