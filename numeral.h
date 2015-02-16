@@ -45,18 +45,46 @@ public:
     bool percent() const;
     QString toString(double number, const QString &nanStub, const NumeralLocale &numeralLocale) const;
     QString toString(float number, const QString &nanStub, const NumeralLocale &numeralLocale) const;
+    template<typename T> QString toString(T number, const QString &nanStub, const NumeralLocale &numeralLocale) const
+    {
+        return toString(static_cast<double>(number), nanStub, numeralLocale);
+    }
     QString toString(double number, const QString &nanStub) const;
     QString toString(float number, const QString &nanStub) const;
+    template<typename T> QString toString(T number, const QString &nanStub) const
+    {
+        return toString(static_cast<double>(number), nanStub);
+    }
     QString toString(double number) const;
     QString toString(float number) const;
+    template<typename T> QString toString(T number) const
+    {
+        return toString(static_cast<double>(number));
+    }
     static QString format(double number, const QString &formatString, const QString &nanStub, const NumeralLocale &numeralLocale);
     static QString format(float number, const QString &formatString, const QString &nanStub, const NumeralLocale &numeralLocale);
+    template<typename T> static QString format(T number, const QString &formatString, const QString &nanStub, const NumeralLocale &numeralLocale)
+    {
+        return format(static_cast<double>(number), formatString, nanStub, numeralLocale);
+    }
     static QString format(double number, const QString &formatString, const QString &nanStub);
     static QString format(float number, const QString &formatString, const QString &nanStub);
+    template<typename T> static QString format(T number, const QString &formatString, const QString &nanStub)
+    {
+        return format(static_cast<double>(number), formatString, nanStub);
+    }
     static QString format(double number, const QString &formatString);
     static QString format(float number, const QString &formatString);
+    template<typename T> static QString format(T number, const QString &formatString)
+    {
+        return format(static_cast<double>(number), formatString);
+    }
     static QString format(double number);
     static QString format(float number);
+    template<typename T> static QString format(T number)
+    {
+        return format(static_cast<double>(number));
+    }
     static void setDefaultNumeralLocale(const NumeralLocale &value);
     static NumeralLocale defaultNumeralLocale();
     static void setDefaultNanStub(const QString &value);
