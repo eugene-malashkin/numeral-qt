@@ -28,7 +28,7 @@ class NumeralFormat
 public:
     NumeralFormat();
     NumeralFormat(const QString &st);
-    NumeralFormat(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent);
+    NumeralFormat(bool sign, bool thousandSeparate, int minPrecision, int maxPrecision, bool percent);
     bool operator == (const NumeralFormat &another);
     bool operator != (const NumeralFormat &another);
     void clear();
@@ -38,10 +38,10 @@ public:
     bool sign() const;
     void setThousandSeparate(bool value);
     bool thousandSeparate() const;
-    void setPrecision(int value);
-    int precision() const;
-    void setExtraPrecision(bool value);
-    bool extraPrecision() const;
+    void setMinPrecision(int value);
+    int minPrecision() const;
+    void setMaxPrecision(int value);
+    int maxPrecision() const;
     void setPercent(bool value);
     bool percent() const;
     QString toString(double number, const QString &nanStub, const NumeralLocale &numeralLocale) const;
@@ -59,7 +59,8 @@ public:
 private:
     bool m_sign;
     bool m_thousandSeparate;
-    int m_precision;
+    int m_minPrecision;
+    int m_maxPrecision;
     bool m_extraPrecision;
     bool m_percent;
     static NumeralLocale *m_defaultNumeralLocale;
@@ -67,6 +68,7 @@ private:
     void parse(const QStringRef &st);
     void parseIntegerPart(const QStringRef &st);
     void parseFractionalPart(const QStringRef &st);
+    bool hasExtraPrecision() const;
     QString decorateSign(const QString &formattedNumber, double number, const NumeralLocale &numeralLocale) const;
     QString decorateThousandSeparator(const QString &formattedNumber, const NumeralLocale &numeralLocale) const;
     QString decorateTrimmingZeros(const QString &formattedNumber, const NumeralLocale &numeralLocale) const;

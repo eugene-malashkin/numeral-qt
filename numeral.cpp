@@ -64,8 +64,8 @@ QString NumeralQt::NumeralLocale::groupSeparator() const
 */
 //******************************************************************************************************
 
-NumeralQt::NumeralLocale *NumeralQt::NumeralFormat::m_defaultNumeralLocale = NULL;
-QString *NumeralQt::NumeralFormat::m_defaultNanStub = NULL;
+NumeralQt::NumeralLocale *NumeralQt::NumeralFormat::m_defaultNumeralLocale = nullptr;
+QString *NumeralQt::NumeralFormat::m_defaultNanStub = nullptr;
 
 NumeralQt::NumeralFormat::NumeralFormat()
 {
@@ -77,13 +77,13 @@ NumeralQt::NumeralFormat::NumeralFormat(const QString &st)
     setFormatString(st);
 }
 
-NumeralQt::NumeralFormat::NumeralFormat(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent)
+NumeralQt::NumeralFormat::NumeralFormat(bool sign, bool thousandSeparate, int minPrecision, int maxPrecision, bool percent)
 {
     clear();
     setSign(sign);
     setThousandSeparate(thousandSeparate);
-    setPrecision(precision);
-    setExtraPrecision(extraPrecision);
+    setMinPrecision(minPrecision);
+    setMaxPrecision(maxPrecision);
     setPercent(percent);
 }
 
@@ -92,8 +92,8 @@ bool NumeralQt::NumeralFormat::operator == (const NumeralFormat &another)
     return
             (m_sign == another.m_sign) &&
             (m_thousandSeparate == another.m_thousandSeparate) &&
-            (m_precision == another.m_precision) &&
-            (m_extraPrecision == another.m_extraPrecision) &&
+            (m_minPrecision == another.m_minPrecision) &&
+            (m_minPrecision == another.m_maxPrecision) &&
             (m_percent == another.m_percent);
 }
 
@@ -106,8 +106,8 @@ void NumeralQt::NumeralFormat::clear()
 {
     m_sign = false;
     m_thousandSeparate = true;
-    m_precision = 0;
-    m_extraPrecision = true;
+    m_minPrecision = 0;
+    m_maxPrecision = 6;
     m_percent = false;
 }
 
@@ -134,17 +134,20 @@ QString NumeralQt::NumeralFormat::formatString() const
     {
         result << "0,0";
     }
-    if (m_precision > 0)
+    if (m_minPrecision > 0)
     {
         result << ".";
-        for (int i = 0; i < m_precision; i++)
+        for (int i = 0; i < m_minPrecision; ++i)
         {
             result << "0";
         }
     }
-    if (m_extraPrecision)
+    if (m_maxPrecision > m_minPrecision)
     {
-        result << "*";
+        for (int i = m_minPrecision; i < m_maxPrecision; ++i)
+        {
+            result << "*";
+        }
     }
     if (m_percent)
     {
@@ -173,24 +176,24 @@ bool NumeralQt::NumeralFormat::thousandSeparate() const
     return m_thousandSeparate;
 }
 
-void NumeralQt::NumeralFormat::setPrecision(int value)
+void NumeralQt::NumeralFormat::setMinPrecision(int value)
 {
-    m_precision = value;
+    m_minPrecision = value;
 }
 
-int NumeralQt::NumeralFormat::precision() const
+int NumeralQt::NumeralFormat::minPrecision() const
 {
-    return m_precision;
+    return m_minPrecision;
 }
 
-void NumeralQt::NumeralFormat::setExtraPrecision(bool value)
+void NumeralQt::NumeralFormat::setMaxPrecision(int value)
 {
-    m_extraPrecision = value;
+    m_maxPrecision = value;
 }
 
-bool NumeralQt::NumeralFormat::extraPrecision() const
+int NumeralQt::NumeralFormat::maxPrecision() const
 {
-    return m_extraPrecision;
+    return m_maxPrecision;
 }
 
 void NumeralQt::NumeralFormat::setPercent(bool value)
@@ -313,23 +316,16 @@ void NumeralQt::NumeralFormat::parse(const QStringRef &st)
         m_percent = false;
     }
 
-    // Extra precision
-    if (remainSt.endsWith('*'))
-    {
-        m_extraPrecision = true;
-        remainSt = remainSt.left(remainSt.length()-1);
-    }
-    else
-    {
-        m_extraPrecision = false;
-    }
-
     // Split integer and fractional parts
     int dotIndex = remainSt.indexOf('.');
     if (dotIndex < 0)
     {
         // Integer part only
         parseIntegerPart(remainSt);
+
+        // No fractional part
+        m_minPrecision = 0;
+        m_maxPrecision = 0;
     }
     else
     {
@@ -345,7 +341,13 @@ void NumeralQt::NumeralFormat::parseIntegerPart(const QStringRef &st)
 
 void NumeralQt::NumeralFormat::parseFractionalPart(const QStringRef &st)
 {
-    m_precision = st.count('0');
+    m_minPrecision = st.count('0');
+    m_maxPrecision = m_minPrecision + st.count('*');
+}
+
+bool NumeralQt::NumeralFormat::hasExtraPrecision() const
+{
+    return (m_maxPrecision > m_minPrecision);
 }
 
 QString NumeralQt::NumeralFormat::decorateSign(const QString &formattedNumber, double number, const NumeralLocale &numeralLocale) const
@@ -393,12 +395,12 @@ QString NumeralQt::NumeralFormat::decorateThousandSeparator(const QString &forma
 QString NumeralQt::NumeralFormat::decorateTrimmingZeros(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
 {
     QString result = formattedNumber;
-    if (extraPrecision())
+    if (hasExtraPrecision())
     {
         int decimalIndex = result.indexOf(numeralLocale.locale().decimalPoint());
         if (decimalIndex >= 0)
         {
-            int stopIndex = decimalIndex + precision();
+            int stopIndex = decimalIndex + minPrecision();
             int truncateAfterIndex = stopIndex;
             for (int i = result.length()-1; i >= stopIndex; i--)
             {
@@ -421,17 +423,12 @@ QString NumeralQt::NumeralFormat::decorateTrimmingZeros(const QString &formatted
 
 QString NumeralQt::NumeralFormat::initialFormat(double positiveNumber, const NumeralLocale &numeralLocale) const
 {
-    int p = 6;
-    if (!extraPrecision())
-    {
-        p = precision();
-    }
-    return numeralLocale.locale().toString(positiveNumber + DBL_EPSILON, 'f', qMax(p, 0));
+    return numeralLocale.locale().toString(positiveNumber + DBL_EPSILON, 'f', qMax(maxPrecision(), 0));
 }
 
 void NumeralQt::NumeralFormat::createDefaultNumeralLocaleIfNeeded()
 {
-    if (m_defaultNumeralLocale == NULL)
+    if (m_defaultNumeralLocale == nullptr)
     {
         m_defaultNumeralLocale = new NumeralLocale;
     }
@@ -439,7 +436,7 @@ void NumeralQt::NumeralFormat::createDefaultNumeralLocaleIfNeeded()
 
 void NumeralQt::NumeralFormat::createDefaultNanStubIfNeeded()
 {
-    if (m_defaultNanStub == NULL)
+    if (m_defaultNanStub == nullptr)
     {
         m_defaultNanStub = new QString;
     }

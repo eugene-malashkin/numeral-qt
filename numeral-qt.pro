@@ -14,10 +14,11 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-
 SOURCES += test.cpp \
     numeral.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
     numeral.h
+
+CONFIG += c++11
