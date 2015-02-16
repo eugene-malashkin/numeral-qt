@@ -1,13 +1,11 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2014-05-12T09:30:31
-#
+# Test project for numeral-qt library
 #-------------------------------------------------
 
+# Include the library
 include(numeral-qt.pri)
 
 QT       += testlib
-
 QT       -= gui
 
 TARGET = test
@@ -17,4 +15,5 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 SOURCES += test.cpp
+
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
