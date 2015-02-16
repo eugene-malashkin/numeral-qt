@@ -4,6 +4,8 @@
 
 #include "numeral.h"
 
+using namespace NumeralQt;
+
 class Test : public QObject
 {
     Q_OBJECT
@@ -18,7 +20,7 @@ private slots:
 
 private:
     void testNumeralFormat(
-            const Numeral &numeral,
+            const NumeralFormat &numeral,
             bool sign,
             bool thousandSeparate,
             int precision,
@@ -30,41 +32,41 @@ private:
 
 Test::Test()
 {
-    Numeral::setDefaultNumeralLocale(QLocale(QLocale::C));
-    Numeral::setDefaultNanStub("n\\a");
+    NumeralFormat::setDefaultNumeralLocale(QLocale(QLocale::C));
+    NumeralFormat::setDefaultNanStub("n\\a");
 }
 
 void Test::testStorying()
 {
-    testNumeralFormat(Numeral(), false, true, 0, true, false, "Numeral format default");
-    testNumeralFormat(Numeral("0,0.*"), false, true, 0, true, false, "Numeral format 0,0.*");
-    testNumeralFormat(Numeral("+0,0.000*%"), true, true, 3, true, true, "Numeral format +0,0.000*%");
-    testNumeralFormat(Numeral("+0.0"), true, false, 1, false, false, "Numeral format +0.0");
-    testNumeralFormat(Numeral("0.00%"), false, false, 2, false, true, "Numeral format 0.00%");
+    testNumeralFormat(NumeralFormat(), false, true, 0, true, false, "Numeral format default");
+    testNumeralFormat(NumeralFormat("0,0.*"), false, true, 0, true, false, "Numeral format 0,0.*");
+    testNumeralFormat(NumeralFormat("+0,0.000*%"), true, true, 3, true, true, "Numeral format +0,0.000*%");
+    testNumeralFormat(NumeralFormat("+0.0"), true, false, 1, false, false, "Numeral format +0.0");
+    testNumeralFormat(NumeralFormat("0.00%"), false, false, 2, false, true, "Numeral format 0.00%");
 }
 
 void Test::testDoing()
 {
-    QVERIFY(Numeral::format(1234.5678) == "1,234.5678");
-    QVERIFY(Numeral::format(1234.5678, "0,0") == "1,235");
-    QVERIFY(Numeral::format(1.2345, "+0.00%") == "+123.45%");
-    QVERIFY(Numeral::format(12345.678, "0,0.*") == "12,345.678");
-    QVERIFY(Numeral::format(12345.678, "0,0.0*") == "12,345.678");
-    QVERIFY(Numeral::format(12345.678, "0,0.0000*") == "12,345.6780");
-    QVERIFY(Numeral::format(12345.678, "0.0000*") == "12345.6780");
-    QVERIFY(Numeral::format(qQNaN(), "0.0", "-") == "-");
+    QVERIFY(NumeralFormat::format(1234.5678) == "1,234.5678");
+    QVERIFY(NumeralFormat::format(1234.5678, "0,0") == "1,235");
+    QVERIFY(NumeralFormat::format(1.2345, "+0.00%") == "+123.45%");
+    QVERIFY(NumeralFormat::format(12345.678, "0,0.*") == "12,345.678");
+    QVERIFY(NumeralFormat::format(12345.678, "0,0.0*") == "12,345.678");
+    QVERIFY(NumeralFormat::format(12345.678, "0,0.0000*") == "12,345.6780");
+    QVERIFY(NumeralFormat::format(12345.678, "0.0000*") == "12345.6780");
+    QVERIFY(NumeralFormat::format(qQNaN(), "0.0", "-") == "-");
 }
 
 void Test::testNumeralLocale()
 {
     NumeralLocale nl(QLocale::C, " ");
-    QVERIFY(Numeral::format(1234.5678, "0,0.*", "-", nl) == "1 234.5678");
+    QVERIFY(NumeralFormat::format(1234.5678, "0,0.*", "-", nl) == "1 234.5678");
 
-    Numeral::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
-    QVERIFY(Numeral::format(1234.5678) == "1 234.5678");
+    NumeralFormat::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
+    QVERIFY(NumeralFormat::format(1234.5678) == "1 234.5678");
 }
 
-void Test::testNumeralFormat(const Numeral &numeral,
+void Test::testNumeralFormat(const NumeralFormat &numeral,
         bool sign,
         bool thousandSeparate,
         int precision,

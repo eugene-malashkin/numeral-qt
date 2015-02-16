@@ -4,6 +4,8 @@
 #include <QString>
 #include <QLocale>
 
+namespace NumeralQt
+{
 class NumeralLocale
 {
 public:
@@ -21,14 +23,14 @@ private:
     QString m_groupSeparator;
 };
 
-class Numeral
+class NumeralFormat
 {
 public:
-    Numeral();
-    Numeral(const QString &st);
-    Numeral(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent);
-    bool operator == (const Numeral &another);
-    bool operator != (const Numeral &another);
+    NumeralFormat();
+    NumeralFormat(const QString &st);
+    NumeralFormat(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent);
+    bool operator == (const NumeralFormat &another);
+    bool operator != (const NumeralFormat &another);
     void clear();
     void setFormatString(const QString &st);
     QString formatString() const;
@@ -72,5 +74,6 @@ private:
     static void createDefaultNumeralLocaleIfNeeded();
     static void createDefaultNanStubIfNeeded();
 };
+}
 
 #endif // NUMERAL_H

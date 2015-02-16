@@ -9,50 +9,50 @@
 */
 //******************************************************************************************************
 
-NumeralLocale::NumeralLocale()
+NumeralQt::NumeralLocale::NumeralLocale()
     : m_locale()
     , m_groupSeparator(m_locale.groupSeparator())
 {
 
 }
 
-NumeralLocale::NumeralLocale(const QLocale &locale)
+NumeralQt::NumeralLocale::NumeralLocale(const QLocale &locale)
     : m_locale(locale)
     , m_groupSeparator(m_locale.groupSeparator())
 {
 
 }
 
-NumeralLocale::NumeralLocale(const QLocale &locale, const QString &groupSeparator)
+NumeralQt::NumeralLocale::NumeralLocale(const QLocale &locale, const QString &groupSeparator)
     : m_locale(locale)
     , m_groupSeparator(groupSeparator)
 {
 
 }
 
-NumeralLocale::NumeralLocale(const NumeralLocale &another)
+NumeralQt::NumeralLocale::NumeralLocale(const NumeralLocale &another)
     : m_locale(another.m_locale)
     , m_groupSeparator(another.m_groupSeparator)
 {
 
 }
 
-void NumeralLocale::setLocale(const QLocale &value)
+void NumeralQt::NumeralLocale::setLocale(const QLocale &value)
 {
     m_locale = value;
 }
 
-QLocale NumeralLocale::locale() const
+QLocale NumeralQt::NumeralLocale::locale() const
 {
     return m_locale;
 }
 
-void NumeralLocale::setGroupSeparator(const QString &value)
+void NumeralQt::NumeralLocale::setGroupSeparator(const QString &value)
 {
     m_groupSeparator = value;
 }
 
-QString NumeralLocale::groupSeparator() const
+QString NumeralQt::NumeralLocale::groupSeparator() const
 {
     return m_groupSeparator;
 }
@@ -64,20 +64,20 @@ QString NumeralLocale::groupSeparator() const
 */
 //******************************************************************************************************
 
-NumeralLocale *Numeral::m_defaultNumeralLocale = NULL;
-QString *Numeral::m_defaultNanStub = NULL;
+NumeralQt::NumeralLocale *NumeralQt::NumeralFormat::m_defaultNumeralLocale = NULL;
+QString *NumeralQt::NumeralFormat::m_defaultNanStub = NULL;
 
-Numeral::Numeral()
+NumeralQt::NumeralFormat::NumeralFormat()
 {
     clear();
 }
 
-Numeral::Numeral(const QString &st)
+NumeralQt::NumeralFormat::NumeralFormat(const QString &st)
 {
     setFormatString(st);
 }
 
-Numeral::Numeral(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent)
+NumeralQt::NumeralFormat::NumeralFormat(bool sign, bool thousandSeparate, int precision, bool extraPrecision, bool percent)
 {
     clear();
     setSign(sign);
@@ -87,7 +87,7 @@ Numeral::Numeral(bool sign, bool thousandSeparate, int precision, bool extraPrec
     setPercent(percent);
 }
 
-bool Numeral::operator == (const Numeral &another)
+bool NumeralQt::NumeralFormat::operator == (const NumeralFormat &another)
 {
     return
             (m_sign == another.m_sign) &&
@@ -97,12 +97,12 @@ bool Numeral::operator == (const Numeral &another)
             (m_percent == another.m_percent);
 }
 
-bool Numeral::operator != (const Numeral &another)
+bool NumeralQt::NumeralFormat::operator != (const NumeralFormat &another)
 {
     return !(operator ==(another));
 }
 
-void Numeral::clear()
+void NumeralQt::NumeralFormat::clear()
 {
     m_sign = false;
     m_thousandSeparate = true;
@@ -111,7 +111,7 @@ void Numeral::clear()
     m_percent = false;
 }
 
-void Numeral::setFormatString(const QString &st)
+void NumeralQt::NumeralFormat::setFormatString(const QString &st)
 {
     clear();
     QStringRef remainSt(&st);
@@ -119,7 +119,7 @@ void Numeral::setFormatString(const QString &st)
     parse(remainSt);
 }
 
-QString Numeral::formatString() const
+QString NumeralQt::NumeralFormat::formatString() const
 {
     QStringList result;
     if (m_sign)
@@ -153,57 +153,57 @@ QString Numeral::formatString() const
     return result.join("");
 }
 
-void Numeral::setSign(bool value)
+void NumeralQt::NumeralFormat::setSign(bool value)
 {
     m_sign = value;
 }
 
-bool Numeral::sign() const
+bool NumeralQt::NumeralFormat::sign() const
 {
     return m_sign;
 }
 
-void Numeral::setThousandSeparate(bool value)
+void NumeralQt::NumeralFormat::setThousandSeparate(bool value)
 {
     m_thousandSeparate = value;
 }
 
-bool Numeral::thousandSeparate() const
+bool NumeralQt::NumeralFormat::thousandSeparate() const
 {
     return m_thousandSeparate;
 }
 
-void Numeral::setPrecision(int value)
+void NumeralQt::NumeralFormat::setPrecision(int value)
 {
     m_precision = value;
 }
 
-int Numeral::precision() const
+int NumeralQt::NumeralFormat::precision() const
 {
     return m_precision;
 }
 
-void Numeral::setExtraPrecision(bool value)
+void NumeralQt::NumeralFormat::setExtraPrecision(bool value)
 {
     m_extraPrecision = value;
 }
 
-bool Numeral::extraPrecision() const
+bool NumeralQt::NumeralFormat::extraPrecision() const
 {
     return m_extraPrecision;
 }
 
-void Numeral::setPercent(bool value)
+void NumeralQt::NumeralFormat::setPercent(bool value)
 {
     m_percent = value;
 }
 
-bool Numeral::percent() const
+bool NumeralQt::NumeralFormat::percent() const
 {
     return m_percent;
 }
 
-QString Numeral::toString(double number, const QString &nanStub, const NumeralLocale &numeralLocale) const
+QString NumeralQt::NumeralFormat::toString(double number, const QString &nanStub, const NumeralLocale &numeralLocale) const
 {
     if (qIsNaN(number))
     {
@@ -229,65 +229,65 @@ QString Numeral::toString(double number, const QString &nanStub, const NumeralLo
     }
 }
 
-QString Numeral::toString(double number, const QString &nanStub) const
+QString NumeralQt::NumeralFormat::toString(double number, const QString &nanStub) const
 {
     return toString(number, nanStub, defaultNumeralLocale());
 }
 
-QString Numeral::toString(double number) const
+QString NumeralQt::NumeralFormat::toString(double number) const
 {
     return toString(number, defaultNanStub());
 }
 
-QString Numeral::format(double number, const QString &formatString, const QString &nanStub, const NumeralLocale &numeralLocale)
+QString NumeralQt::NumeralFormat::format(double number, const QString &formatString, const QString &nanStub, const NumeralLocale &numeralLocale)
 {
-    Numeral obj(formatString);
+    NumeralFormat obj(formatString);
     return obj.toString(number, nanStub, numeralLocale);
 }
 
-QString Numeral::format(double number, const QString &formatString, const QString &nanStub)
+QString NumeralQt::NumeralFormat::format(double number, const QString &formatString, const QString &nanStub)
 {
-    Numeral obj(formatString);
+    NumeralFormat obj(formatString);
     return obj.toString(number, nanStub);
 }
 
-QString Numeral::format(double number, const QString &formatString)
+QString NumeralQt::NumeralFormat::format(double number, const QString &formatString)
 {
-    Numeral obj(formatString);
+    NumeralFormat obj(formatString);
     return obj.toString(number);
 }
 
-QString Numeral::format(double number)
+QString NumeralQt::NumeralFormat::format(double number)
 {
-    Numeral obj;
+    NumeralFormat obj;
     return obj.toString(number);
 }
 
-void Numeral::setDefaultNumeralLocale(const NumeralLocale &value)
+void NumeralQt::NumeralFormat::setDefaultNumeralLocale(const NumeralLocale &value)
 {
     createDefaultNumeralLocaleIfNeeded();
     *m_defaultNumeralLocale = value;
 }
 
-NumeralLocale Numeral::defaultNumeralLocale()
+NumeralQt::NumeralLocale NumeralQt::NumeralFormat::defaultNumeralLocale()
 {
     createDefaultNumeralLocaleIfNeeded();
     return *m_defaultNumeralLocale;
 }
 
-void Numeral::setDefaultNanStub(const QString &value)
+void NumeralQt::NumeralFormat::setDefaultNanStub(const QString &value)
 {
     createDefaultNanStubIfNeeded();
     *m_defaultNanStub = value;
 }
 
-QString Numeral::defaultNanStub()
+QString NumeralQt::NumeralFormat::defaultNanStub()
 {
     createDefaultNanStubIfNeeded();
     return *m_defaultNanStub;
 }
 
-void Numeral::parse(const QStringRef &st)
+void NumeralQt::NumeralFormat::parse(const QStringRef &st)
 {
     QStringRef remainSt = st;
 
@@ -338,17 +338,17 @@ void Numeral::parse(const QStringRef &st)
     }
 }
 
-void Numeral::parseIntegerPart(const QStringRef &st)
+void NumeralQt::NumeralFormat::parseIntegerPart(const QStringRef &st)
 {
     m_thousandSeparate = st.contains(",");
 }
 
-void Numeral::parseFractionalPart(const QStringRef &st)
+void NumeralQt::NumeralFormat::parseFractionalPart(const QStringRef &st)
 {
     m_precision = st.count('0');
 }
 
-QString Numeral::decorateSign(const QString &formattedNumber, double number, const NumeralLocale &numeralLocale) const
+QString NumeralQt::NumeralFormat::decorateSign(const QString &formattedNumber, double number, const NumeralLocale &numeralLocale) const
 {
     QString s;
     bool isNegative = (number < -DBL_EPSILON);
@@ -364,7 +364,7 @@ QString Numeral::decorateSign(const QString &formattedNumber, double number, con
     return s + formattedNumber;
 }
 
-QString Numeral::decorateThousandSeparator(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
+QString NumeralQt::NumeralFormat::decorateThousandSeparator(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
 {
     if (!thousandSeparate())
     {
@@ -390,7 +390,7 @@ QString Numeral::decorateThousandSeparator(const QString &formattedNumber, const
     }
 }
 
-QString Numeral::decorateTrimmingZeros(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
+QString NumeralQt::NumeralFormat::decorateTrimmingZeros(const QString &formattedNumber, const NumeralLocale &numeralLocale) const
 {
     QString result = formattedNumber;
     if (extraPrecision())
@@ -419,7 +419,7 @@ QString Numeral::decorateTrimmingZeros(const QString &formattedNumber, const Num
     return result;
 }
 
-QString Numeral::initialFormat(double positiveNumber, const NumeralLocale &numeralLocale) const
+QString NumeralQt::NumeralFormat::initialFormat(double positiveNumber, const NumeralLocale &numeralLocale) const
 {
     int p = 6;
     if (!extraPrecision())
@@ -429,7 +429,7 @@ QString Numeral::initialFormat(double positiveNumber, const NumeralLocale &numer
     return numeralLocale.locale().toString(positiveNumber + DBL_EPSILON, 'f', qMax(p, 0));
 }
 
-void Numeral::createDefaultNumeralLocaleIfNeeded()
+void NumeralQt::NumeralFormat::createDefaultNumeralLocaleIfNeeded()
 {
     if (m_defaultNumeralLocale == NULL)
     {
@@ -437,7 +437,7 @@ void Numeral::createDefaultNumeralLocaleIfNeeded()
     }
 }
 
-void Numeral::createDefaultNanStubIfNeeded()
+void NumeralQt::NumeralFormat::createDefaultNanStubIfNeeded()
 {
     if (m_defaultNanStub == NULL)
     {
