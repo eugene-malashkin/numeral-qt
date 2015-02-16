@@ -38,7 +38,7 @@ Test::Test()
 
 void Test::testStorying()
 {
-    testNumeralFormat(NumeralFormat(), false, true, 0, 7, false, "Numeral format default");
+    testNumeralFormat(NumeralFormat(), false, true, 0, 6, false, "Numeral format default");
     testNumeralFormat(NumeralFormat("0,0.*"), false, true, 0, 1, false, "Numeral format 0,0.*");
     testNumeralFormat(NumeralFormat("0,0.000****"), false, true, 3, 7, false, "Numeral format 0,0.*");
     testNumeralFormat(NumeralFormat("+0,0.000*%"), true, true, 3, 4, true, "Numeral format +0,0.000*%");
@@ -61,6 +61,8 @@ void Test::testDoing()
     QVERIFY(NumeralFormat::format(1.2345678, "0.00****") == "1.234568");
     QVERIFY(NumeralFormat::format(1.2345, "0.00****") == "1.2345");
     QVERIFY(NumeralFormat::format(1.2, "0.00****") == "1.20");
+    QVERIFY(NumeralFormat::format(static_cast<float>(1.222222222222222222), "0.000000000000000000") == "1.222222");
+    QVERIFY(NumeralFormat::format(static_cast<double>(1.222222222222222222), "0.000000000000000000") == "1.222222222222222");
 }
 
 void Test::testNumeralLocale()
