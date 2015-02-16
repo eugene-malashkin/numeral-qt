@@ -4,6 +4,8 @@
 #
 #-------------------------------------------------
 
+include(numeral-qt.pri)
+
 QT       += testlib
 
 QT       -= gui
@@ -14,11 +16,5 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += test.cpp \
-    numeral.cpp
+SOURCES += test.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
-
-HEADERS += \
-    numeral.h
-
-CONFIG += c++11
