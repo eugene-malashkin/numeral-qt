@@ -28,18 +28,18 @@ The library uses C++11.
 
 ## Format string
 
-This library was inspired by http://numeraljs.com/, but has a slightly different syntax. 
+The library was inspired by http://numeraljs.com/, but has a slightly different syntax. 
 
-You can define numeral format in one string named "format string". For instance, you would like to format number without thousands separator ("0") and with two digits after dot (".00"):
+You can define numeral format in one string named "format string". For instance, you would like to format number without thousands separator ("0") and with two digits after dot (".00"), you should use format string "0.00":
 ```c++
-QString st = NumeralFormat::format(12345.678, "0.00"); // result "12345.68", format string is "0.00"
+QString st = NumeralFormat::format(12345.678, "0.00"); // st == "12345.68", format string == "0.00"
 ```
 
 Here are more advanced examples. Format number with thousands separator ("0,0") and with two digits after dot (".00"):
 ```c++
 NumeralFormat::format(12345.678, "0,0.00"); // "12,345.68"
 ```
-Format number with thousands separator ("0,0") and with necessary digits after dot in an amount from 2 to 4 (.00**):
+Format number with thousands separator ("0,0") and with necessary digits after dot in an amount from 2 to 4 (".00**"):
 ```c++
 NumeralFormat::format(12345,       "0,0.00**"); // "12,345.00"   minimal digits after dot = 2
 NumeralFormat::format(12345.678,   "0,0.00**"); // "12,345.678"  digits after dot between 2 and 4
@@ -57,15 +57,15 @@ NumeralFormat::format(-0.12345, "+0.00%"); // "-12.35%"
 ```
 
 ## Storing numeral format
-You can use instance of NumeralFormat class for storing numeral format.
+You can use an instance of NumeralFormat class for storing numeral format.
 ```c++
 NumeralFormat n("+0.00%");  // you can use default constructor, or copy of NumeralFormat, or from QString
 n.setPrecisionRange(3, 4);  // set precision range (the count of digits after dot) between 3 and 4
-QString st = n.toString(0.1234); // "+12.340%"
+QString st = n.toString(0.1234); // st == "+12.340%"
 ```
 
 ## Working with locale
-You can use appropriate locale for formatting. Because of you can't change locale parameters, there is NumeralLocale class - a composition of QLocale and changeable group separator. 
+You can use appropriate locale for formatting. Because of you can't change QLocale parameters, there is NumeralLocale class - a composition of QLocale and changeable group separator. 
 ```c++
 NumeralLocale nl(QLocale::C, " ");  // " " is group separator
 NumeralFormat::format(1234.5678, "0,0.*", "NaN", nl); // "1 234.6"
@@ -76,7 +76,7 @@ Or you can define default numeral locale once, and don't care about specifying i
 NumeralFormat::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
 
 // Later
-NumeralFormat::format(1234.5678);  //"1 234.5678"
+NumeralFormat::format(1234.5678);  // "1 234.5678"
 ```
 
 ## Working with NaN
