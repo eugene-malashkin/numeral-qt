@@ -87,17 +87,17 @@ NumeralQt::NumeralFormat::NumeralFormat(bool sign, bool thousandSeparate, int mi
     setPercent(percent);
 }
 
-bool NumeralQt::NumeralFormat::operator == (const NumeralFormat &another)
+bool NumeralQt::NumeralFormat::operator == (const NumeralFormat &another) const
 {
     return
             (m_sign == another.m_sign) &&
             (m_thousandSeparate == another.m_thousandSeparate) &&
             (m_minPrecision == another.m_minPrecision) &&
-            (m_minPrecision == another.m_maxPrecision) &&
+            (m_maxPrecision == another.m_maxPrecision) &&
             (m_percent == another.m_percent);
 }
 
-bool NumeralQt::NumeralFormat::operator != (const NumeralFormat &another)
+bool NumeralQt::NumeralFormat::operator != (const NumeralFormat &another) const
 {
     return !(operator ==(another));
 }
@@ -114,9 +114,12 @@ void NumeralQt::NumeralFormat::clear()
 void NumeralQt::NumeralFormat::setFormatString(const QString &st)
 {
     clear();
-    QStringRef remainSt(&st);
-    remainSt = remainSt.trimmed();
-    parse(remainSt);
+    if (!st.isEmpty())
+    {
+        QStringRef remainSt(&st);
+        remainSt = remainSt.trimmed();
+        parse(remainSt);
+    }
 }
 
 QString NumeralQt::NumeralFormat::formatString() const

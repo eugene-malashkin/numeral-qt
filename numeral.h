@@ -29,8 +29,8 @@ public:
     NumeralFormat();
     NumeralFormat(const QString &st);
     NumeralFormat(bool sign, bool thousandSeparate, int minPrecision, int maxPrecision, bool percent);
-    bool operator == (const NumeralFormat &another);
-    bool operator != (const NumeralFormat &another);
+    bool operator == (const NumeralFormat &another) const;
+    bool operator != (const NumeralFormat &another) const;
     void clear();
     void setFormatString(const QString &st);
     QString formatString() const;

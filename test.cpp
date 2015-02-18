@@ -14,20 +14,12 @@ public:
     Test();
 
 private slots:
+    void testStorying_data();
     void testStorying();
-    void testDoing();
+    void testFormat_data();
+    void testFormat();
+    void testDifferentTypes();
     void testNumeralLocale();
-
-private:
-    void testNumeralFormat(
-            const NumeralFormat &numeral,
-            bool sign,
-            bool thousandSeparate,
-            int minPrecision,
-            int maxPrecision,
-            bool percent,
-            const QString &caseDescription);
-    QString bts(bool b);
 };
 
 Test::Test()
@@ -36,33 +28,74 @@ Test::Test()
     NumeralFormat::setDefaultNanStub("n\\a");
 }
 
-void Test::testStorying()
+void Test::testStorying_data()
 {
-    testNumeralFormat(NumeralFormat(), false, true, 0, 6, false, "Numeral format default");
-    testNumeralFormat(NumeralFormat("0,0.*"), false, true, 0, 1, false, "Numeral format 0,0.*");
-    testNumeralFormat(NumeralFormat("0,0.000****"), false, true, 3, 7, false, "Numeral format 0,0.*");
-    testNumeralFormat(NumeralFormat("+0,0.000*%"), true, true, 3, 4, true, "Numeral format +0,0.000*%");
-    testNumeralFormat(NumeralFormat("+0.0"), true, false, 1, 1, false, "Numeral format +0.0");
-    testNumeralFormat(NumeralFormat("0.00%"), false, false, 2, 2, true, "Numeral format 0.00%");
+    QTest::addColumn<QString>("st");
+    QTest::addColumn<bool>("sign");
+    QTest::addColumn<bool>("thousandSeparate");
+    QTest::addColumn<int>("minPrecision");
+    QTest::addColumn<int>("maxPrecision");
+    QTest::addColumn<bool>("percent");
+
+    QTest::newRow("1") << "" << false << true << 0 << 6 << false;
+    QTest::newRow("2") << "0,0.*" << false << true << 0 << 1 << false;
+    QTest::newRow("3") << "0,0.000****" << false << true << 3 << 7 << false;
+    QTest::newRow("4") << "+0,0.000*%" << true << true << 3 << 4 << true;
+    QTest::newRow("5") << "+0.0" << true << false << 1 << 1 << false;
+    QTest::newRow("6") << "0.00%" << false << false << 2 << 2 << true;
 }
 
-void Test::testDoing()
+void Test::testStorying()
 {
-    QVERIFY(NumeralFormat::format(1234.5678) == "1,234.5678");
-    QVERIFY(NumeralFormat::format(1234.5678, "0,0") == "1,235");
-    QVERIFY(NumeralFormat::format(1.2345, "+0.00%") == "+123.45%");
-    QVERIFY(NumeralFormat::format(12345.678, "0,0.*") == "12,345.7");
-    QVERIFY(NumeralFormat::format(12345.678, "0,0.0*") == "12,345.68");
-    QVERIFY(NumeralFormat::format(12345.678, "0,0.0**") == "12,345.678");
-    QVERIFY(NumeralFormat::format(12345.6789, "0,0.0**") == "12,345.679");
-    QVERIFY(NumeralFormat::format(12345.678, "0,0.0000*") == "12,345.6780");
-    QVERIFY(NumeralFormat::format(12345.678, "0.0000*") == "12345.6780");
-    QVERIFY(NumeralFormat::format(qQNaN(), "0.0", "-") == "-");
-    QVERIFY(NumeralFormat::format(1.2345678, "0.00****") == "1.234568");
-    QVERIFY(NumeralFormat::format(1.2345, "0.00****") == "1.2345");
-    QVERIFY(NumeralFormat::format(1.2, "0.00****") == "1.20");
-    QVERIFY(NumeralFormat::format(static_cast<float>(1.222222222222222222), "0.000000000000000000") == "1.222222");
-    QVERIFY(NumeralFormat::format(static_cast<double>(1.222222222222222222), "0.000000000000000000") == "1.222222222222222");
+    QFETCH(QString, st);
+    QFETCH(bool, sign);
+    QFETCH(bool, thousandSeparate);
+    QFETCH(int, minPrecision);
+    QFETCH(int, maxPrecision);
+    QFETCH(bool, percent);
+    NumeralFormat l(st);
+    NumeralFormat r(sign, thousandSeparate, minPrecision, maxPrecision, percent);
+    QCOMPARE(l, r);
+    if (st.isEmpty())
+    {
+        // Test also default constructor. Thus, NumeralFormat() and NumeralFormat("") should be the same.
+        QCOMPARE(NumeralFormat(st), NumeralFormat(sign, thousandSeparate, minPrecision, maxPrecision, percent));
+    }
+}
+
+void Test::testFormat_data()
+{
+    QTest::addColumn<double>("number");
+    QTest::addColumn<QString>("st");
+    QTest::addColumn<QString>("result");
+
+    QTest::newRow("1") << 1234.5678 << QString() << "1,234.5678";
+    QTest::newRow("2") << 1234.5678 << "0,0" << "1,235";
+    QTest::newRow("3") << 1.2345 << "+0.00%" << "+123.45%";
+    QTest::newRow("4") << 12345.678 << "0,0.*" << "12,345.7";
+    QTest::newRow("5") << 12345.678 << "0,0.0*" << "12,345.68";
+    QTest::newRow("6") << 12345.678 << "0,0.0**" << "12,345.678";
+    QTest::newRow("7") << 12345.6789 << "0,0.0**" << "12,345.679";
+    QTest::newRow("8") << 12345.678 << "0,0.0000*" << "12,345.6780";
+    QTest::newRow("9") << 12345.678 << "0.0000*" << "12345.6780";
+    QTest::newRow("10") << qQNaN() << "0.0" << "n\\a";
+    QTest::newRow("11") << 1.2345678 << "0.00****" << "1.234568";
+    QTest::newRow("12") << 1.2345 << "0.00****" << "1.2345";
+    QTest::newRow("13") << 1.2 << "0.00****" << "1.20";
+}
+
+void Test::testFormat()
+{
+    QFETCH(double, number);
+    QFETCH(QString, st);
+    QFETCH(QString, result);
+    QCOMPARE(NumeralFormat::format(number, st), result);
+}
+
+void Test::testDifferentTypes()
+{
+    QVERIFY(NumeralFormat::format(static_cast<float>(1.222222222222222222), "0.000000000000000000000") == "1.222222");
+    QVERIFY(NumeralFormat::format(static_cast<double>(1.222222222222222222), "0.000000000000000000000") == "1.222222222222222");
 }
 
 void Test::testNumeralLocale()
@@ -74,25 +107,6 @@ void Test::testNumeralLocale()
     QVERIFY(NumeralFormat::format(1234.5678) == "1 234.5678");
 }
 
-void Test::testNumeralFormat(const NumeralFormat &numeral,
-        bool sign,
-        bool thousandSeparate,
-        int minPrecision,
-        int maxPrecision,
-        bool percent,
-        const QString &caseDescription)
-{
-    QVERIFY2(numeral.sign() == sign, QString("%1. Sign must be %2").arg(caseDescription).arg(bts(sign)).toUtf8());
-    QVERIFY2(numeral.thousandSeparate() == thousandSeparate, QString("%1. Thousand separate must be %2").arg(caseDescription).arg(bts(thousandSeparate)).toUtf8());
-    QVERIFY2(numeral.minPrecision() == minPrecision, QString("%1. Min precision must be %2").arg(caseDescription).arg(minPrecision).toUtf8());
-    QVERIFY2(numeral.maxPrecision() == maxPrecision, QString("%1. Max precision must be %2").arg(caseDescription).arg(maxPrecision).toUtf8());
-    QVERIFY2(numeral.percent() == percent, QString("%1. Percent must be %2").arg(caseDescription).arg(bts(percent)).toUtf8());
-}
-
-QString Test::bts(bool b)
-{
-    return (b)? "true" : "false";
-}
 
 QTEST_MAIN(Test)
 
