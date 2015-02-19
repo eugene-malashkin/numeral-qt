@@ -69,8 +69,11 @@ QString st = NumeralFormat::format(-0.12345, "+0.00%")		// st == "-12.35%"
 ## Storing numeral format
 You can use an instance of NumeralFormat class for storing numeral format.
 ```c++
-NumeralFormat n("+0.00%");  // you can use default constructor, or copy of NumeralFormat, or from QString
-n.setPrecisionRange(3, 4);  // set precision range (the count of digits after dot) between 3 and 4
+// You can use default constructor, or copy of NumeralFormat, or from QString
+NumeralFormat n("+0.00%");
+// Set precision range (the count of digits after dot) between 3 and 4
+n.setPrecisionRange(3, 4);
+
 QString st = n.toString(0.1234); // st == "+12.340%"
 ```
 
