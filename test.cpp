@@ -19,7 +19,9 @@ private slots:
     void testFormat_data();
     void testFormat();
     void testDifferentTypes();
-    void testNumeralLocale();
+    void testReadmeFormatSamples();
+    void testReadmeLocaleSamples();
+    void testReadmeNaNSamples();
 };
 
 Test::Test()
@@ -98,13 +100,47 @@ void Test::testDifferentTypes()
     QVERIFY(NumeralFormat::format(static_cast<double>(1.222222222222222222), "0.000000000000000000000") == "1.222222222222222");
 }
 
-void Test::testNumeralLocale()
+void Test::testReadmeFormatSamples()
 {
-    NumeralLocale nl(QLocale::C, " ");
-    QVERIFY(NumeralFormat::format(1234.5678, "0,0.*", "-", nl) == "1 234.6");
+    {
+        QString st = NumeralFormat::format(12345.67, "0,0.0");
+        QVERIFY2(st == "12,345.7", "format(12345.67, \"0,0.0\") fail");
+    }
+    {
+        QString st = NumeralFormat::format(12345.678, "0.00"); // st == "12345.68"
+        QVERIFY2(st == "12345.68", "format(12345.678, \"0.00\") fail");
+    }
+    {
+        QVERIFY2(NumeralFormat::format(12345.678, "0,0.00") == "12,345.68", "NumeralFormat::format(12345.678, \"0,0.00\") fail");
+        QVERIFY2(NumeralFormat::format(12345,       "0,0.00**") == "12,345.00", "NumeralFormat::format(12345,       \"0,0.00**\") fail");
+        QVERIFY2(NumeralFormat::format(12345.678,   "0,0.00**") == "12,345.678", "NumeralFormat::format(12345.678,   \"0,0.00**\") fail");
+        QVERIFY2(NumeralFormat::format(12345.65438, "0,0.00**") == "12,345.6544", "NumeralFormat::format(12345.65438, \"0,0.00**\") fail");
+        QVERIFY2(NumeralFormat::format(12345.678, "+0") == "+12346", "NumeralFormat::format(12345.678, \"+0\") fail");
+        QVERIFY2(NumeralFormat::format(-12345, "+0") == "-12345", "NumeralFormat::format(-12345, \"+0\") fail");
+        QVERIFY2(NumeralFormat::format(0.1234, "+0.00%") == "+12.34%", "NumeralFormat::format(0.1234, \"+0.00%\") fail");
+        QVERIFY2(NumeralFormat::format(-0.12345, "+0.00%") == "-12.35%", "NumeralFormat::format(-0.12345, \"+0.00%\") fail");
+    }
+    {
+        NumeralFormat n("+0.00%");
+        n.setPrecisionRange(3, 4);
+        QString st = n.toString(0.1234);
+        QVERIFY2(st == "+12.340%", "Storing numeral format failed");
+    }
+}
 
+void Test::testReadmeLocaleSamples()
+{
+    NumeralLocale nl(QLocale::C, " ");  // " " is group separator
+    QVERIFY2(NumeralFormat::format(1234.5678, "0,0.*", "NaN", nl) == "1 234.6", "Working with specific locale fail");
     NumeralFormat::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
-    QVERIFY(NumeralFormat::format(1234.5678) == "1 234.5678");
+    QVERIFY2(NumeralFormat::format(1234.5678) == "1 234.5678", "Working with default locale fail");
+}
+
+void Test::testReadmeNaNSamples()
+{
+    QVERIFY2(NumeralFormat::format(qQNaN(), "0.0", "-") == "-", "Working with specific NaN fail");
+    NumeralFormat::setDefaultNanStub("nOT a nUMBER");
+    QVERIFY2(NumeralFormat::format(qQNaN()) == "nOT a nUMBER", "Working with default NaN fail");
 }
 
 

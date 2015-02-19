@@ -32,28 +32,29 @@ The library was inspired by http://numeraljs.com/, but has a slightly different 
 
 You can define numeral format in one string named "format string". For instance, you would like to format number without thousands separator ("0") and with two digits after dot (".00"), you should use format string "0.00":
 ```c++
-QString st = NumeralFormat::format(12345.678, "0.00"); // st == "12345.68", format string == "0.00"
+// Format number 12345.678 with format string "0.00"
+QString st = NumeralFormat::format(12345.678, "0.00"); // st == "12345.68"
 ```
 
 Here are more advanced examples. Format number with thousands separator ("0,0") and with two digits after dot (".00"):
 ```c++
-NumeralFormat::format(12345.678, "0,0.00"); // "12,345.68"
+NumeralFormat::format(12345.678, "0,0.00") // "12,345.68"
 ```
 Format number with thousands separator ("0,0") and with necessary digits after dot in an amount from 2 to 4 (".00**"):
 ```c++
-NumeralFormat::format(12345,       "0,0.00**"); // "12,345.00"   minimal digits after dot = 2
-NumeralFormat::format(12345.678,   "0,0.00**"); // "12,345.678"  digits after dot between 2 and 4
-NumeralFormat::format(12345.65438, "0,0.00**"); // "12,345.6544" maximal digits after dot = 4
+NumeralFormat::format(12345,       "0,0.00**") // "12,345.00"   minimal digits after dot = 2
+NumeralFormat::format(12345.678,   "0,0.00**") // "12,345.678"  digits after dot between 2 and 4
+NumeralFormat::format(12345.65438, "0,0.00**") // "12,345.6544" maximal digits after dot = 4
 ```
 Format number with sign ("+"), without thousands separator ("0") and no digits after dot:
 ```c++
-NumeralFormat::format(12345.678, "+0"); // "+12345"
-NumeralFormat::format(-12345, "+0");    // "-12345"
+NumeralFormat::format(12345.678, "+0") // "+12346"
+NumeralFormat::format(-12345, "+0")    // "-12345"
 ```
 Format number as percent ("%") with two digits after dot, with sign ("+"), without thousands separator ("0"):
 ```c++
-NumeralFormat::format(0.1234, "+0.00%"); // "+12.34%"
-NumeralFormat::format(-0.12345, "+0.00%"); // "-12.35%"
+NumeralFormat::format(0.1234, "+0.00%")		// "+12.34%"
+NumeralFormat::format(-0.12345, "+0.00%")	// "-12.35%"
 ```
 
 ## Storing numeral format
@@ -68,7 +69,8 @@ QString st = n.toString(0.1234); // st == "+12.340%"
 You can use appropriate locale for formatting. Because of you can't change QLocale parameters, there is NumeralLocale class - a composition of QLocale and changeable group separator. 
 ```c++
 NumeralLocale nl(QLocale::C, " ");  // " " is group separator
-NumeralFormat::format(1234.5678, "0,0.*", "NaN", nl); // "1 234.6"
+QString st = 
+	NumeralFormat::format(1234.5678, "0,0.*", "NaN", nl); // st == "1 234.6"
 ```
 
 Or you can define default numeral locale once, and don't care about specifying it later:
@@ -76,13 +78,13 @@ Or you can define default numeral locale once, and don't care about specifying i
 NumeralFormat::setDefaultNumeralLocale(NumeralLocale(QLocale::C, " "));
 
 // Later
-NumeralFormat::format(1234.5678);  // "1 234.5678"
+QString st = NumeralFormat::format(1234.5678);  // st == "1 234.5678"
 ```
 
 ## Working with NaN
 You can format NaN as you want:
 ```c++
-NumeralFormat::format(qQNaN(), "0.0", "-"); // "-" as we defined in third parameter
+NumeralFormat::format(qQNaN(), "0.0", "-") // "-" (as we defined in third parameter)
 ```
 
 Or you can define default NaN stub once, and don't care about specifying it later:
@@ -90,5 +92,5 @@ Or you can define default NaN stub once, and don't care about specifying it late
 NumeralFormat::setDefaultNanStub("nOT a nUMBER");
 
 // Later
-NumeralFormat::format(qQNaN()); // "nOT a nUMBER"
+QString st = NumeralFormat::format(qQNaN()); // st == "nOT a nUMBER"
 ```
