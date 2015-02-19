@@ -5,8 +5,9 @@ Class NumeralFormat designed for formatting numbers. The simplest example:
 ```c++
 using namespace NumeralQt;	// The library's namespace
 
-// Format number 12345.67 with format string "0,0.0" (use thousands separator, one digit after dot):
-QString st = NumeralFormat::format(12345.67, "0,0.0"); // "12,345.7"
+// Format number 12345.67 with format string "0,0.0". 
+// Format string "0,0.0" means "use thousands separator, one digit after dot)":
+QString st = NumeralFormat::format(12345.67, "0,0.0"); // st == "12,345.7"
 ```
 
 ## Usage
@@ -43,17 +44,25 @@ NumeralFormat::format(12345.678, "0,0.00") // "12,345.68"
 Format number with thousands separator ("0,0") and with necessary digits after dot in an amount from 2 to 4 (".00**"):
 ```c++
 NumeralFormat::format(12345,       "0,0.00**") // "12,345.00"   minimal digits after dot = 2
+```
+```c++
 NumeralFormat::format(12345.678,   "0,0.00**") // "12,345.678"  digits after dot between 2 and 4
+```
+```c++
 NumeralFormat::format(12345.65438, "0,0.00**") // "12,345.6544" maximal digits after dot = 4
 ```
 Format number with sign ("+"), without thousands separator ("0") and no digits after dot:
 ```c++
 NumeralFormat::format(12345.678, "+0") // "+12346"
+```
+```c++
 NumeralFormat::format(-12345, "+0")    // "-12345"
 ```
 Format number as percent ("%") with two digits after dot, with sign ("+"), without thousands separator ("0"):
 ```c++
 NumeralFormat::format(0.1234, "+0.00%")		// "+12.34%"
+```
+```c++
 NumeralFormat::format(-0.12345, "+0.00%")	// "-12.35%"
 ```
 
