@@ -23,7 +23,7 @@ And then include numeral.h in your code:
 #include <numeral.h>
 ```
 
-Or you can just copy two files, numeral.h and .cpp, in appropriate directory and use it without "numeral-qt.pri".
+Or you can just copy two files, numeral.h and numeral.cpp, in appropriate directory and use it without "numeral-qt.pri".
 
 The library uses C++11.
 
@@ -31,7 +31,7 @@ The library uses C++11.
 
 The library was inspired by http://numeraljs.com/, but has a slightly different syntax. 
 
-You can define numeral format in one string named "format string". For instance, you would like to format number without thousands separator ("0") and with two digits after dot (".00"), you should use format string "0.00":
+You can define numeral format in one string named "format string". For instance, if you want to format number without thousands separator ("0") and with two digits after dot (".00"), you should use format string "0.00":
 ```c++
 // Format number 12345.678 with format string "0.00"
 QString st = NumeralFormat::format(12345.678, "0.00"); // st == "12345.68"
@@ -53,17 +53,17 @@ QString st = NumeralFormat::format(12345.65438, "0,0.00**") // st == "12,345.654
 ```
 Format number with sign ("+"), without thousands separator ("0") and no digits after dot:
 ```c++
-QString st = NumeralFormat::format(12345.678, "+0") // st == "+12346"
+QString st = NumeralFormat::format(12345.678,	"+0") // st == "+12346"
 ```
 ```c++
-QString st = NumeralFormat::format(-12345, "+0")    // st == "-12345"
+QString st = NumeralFormat::format(-12345,		"+0") // st == "-12345"
 ```
-Format number as percent ("%") with two digits after dot, with sign ("+"), without thousands separator ("0"):
+Format number as percent ("%" at the end of format string) with two digits after dot, with sign ("+"), without thousands separator ("0"):
 ```c++
-QString st = NumeralFormat::format(0.1234, "+0.00%")		// st == "+12.34%"
+QString st = NumeralFormat::format(0.1234,		"+0.00%")		// st == "+12.34%"
 ```
 ```c++
-QString st = NumeralFormat::format(-0.12345, "+0.00%")		// st == "-12.35%"
+QString st = NumeralFormat::format(-0.12345,	"+0.00%")		// st == "-12.35%"
 ```
 
 ## Storing numeral format
