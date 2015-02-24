@@ -95,7 +95,6 @@ private:
     bool m_thousandSeparate;
     int m_minPrecision;
     int m_maxPrecision;
-    bool m_extraPrecision;
     bool m_percent;
     static NumeralLocale *m_defaultNumeralLocale;
     static QString *m_defaultNanStub;

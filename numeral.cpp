@@ -214,7 +214,7 @@ QString NumeralQt::NumeralFormat::toString(double number, const QString &nanStub
     else
     {
         double cnumber = (percent())? number*100.0 : number;
-        QString result = initialFormat(fabs(cnumber), numeralLocale);
+        QString result = initialFormat(static_cast<double>(fabs(cnumber)), numeralLocale);
         result = decorateTrimmingZeros(result, numeralLocale);
         result = decorateThousandSeparator(result, numeralLocale);
         result = decorateSign(result, cnumber, numeralLocale);
@@ -232,7 +232,7 @@ QString NumeralQt::NumeralFormat::toString(float number, const QString &nanStub,
     else
     {
         float cnumber = (percent())? number*100.0 : number;
-        QString result = initialFormat(fabs(cnumber), numeralLocale);
+        QString result = initialFormat(static_cast<float>(fabs(cnumber)), numeralLocale);
         result = decorateTrimmingZeros(result, numeralLocale);
         result = decorateThousandSeparator(result, numeralLocale);
         result = decorateSign(result, cnumber, numeralLocale);
